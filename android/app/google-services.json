@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "222781847153",
+    "project_id": "cloud-firestore-26511",
+    "storage_bucket": "cloud-firestore-26511.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222781847153:android:954dd60d52182cadbfcdd0",
+        "android_client_info": {
+          "package_name": "com.example.cloud_firestore_prac"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA08s_r8hCscK57oY0iUM3VhzK0zLOAPp0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222781847153:android:ad62742ad3e72a58bfcdd0",
+        "android_client_info": {
+          "package_name": "com.example.graphs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA08s_r8hCscK57oY0iUM3VhzK0zLOAPp0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222781847153:android:e1a400b0b4405042bfcdd0",
+        "android_client_info": {
+          "package_name": "com.example.internship_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA08s_r8hCscK57oY0iUM3VhzK0zLOAPp0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
