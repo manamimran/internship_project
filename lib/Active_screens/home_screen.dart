@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           body: Padding(
             padding: EdgeInsets.all(10),
-            child: Column(
+            child: Column(mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Display the posts
                 SingleChildScrollView(
@@ -32,10 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: ListView.builder(
                       itemCount: postProvider.posts.length,
                       itemBuilder: (context, index) {
-                        String imageUrl = postProvider.posts[index].imageUrl;
-                        String userId = postProvider.posts[index].userId;
+                        String imageUrl = postProvider.posts[index].postimageUrl;
+                        // String userId = postProvider.posts[index].userId;
 
-                        return PostWidget(imageUrl, userId);
+                        return Container(padding: EdgeInsets.all(10),
+                            child: PostWidget(imageUrl));
                       },
                     ),
                   ),
@@ -68,12 +69,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget PostWidget(String imageUrl, String userId) {
-    return Container(
+  Widget PostWidget(String imageUrl) {
+    return Container(padding: EdgeInsets.only(top:80 ,bottom: 50,right: 20,left: 20),
       decoration: BoxDecoration(
         color: Colors.grey, // Set your desired background color
         borderRadius:
-            BorderRadius.circular(10.0), // Set your desired border radius
+            BorderRadius.circular(20.0), // Set your desired border radius
       ),
       child: Column(
         children: [

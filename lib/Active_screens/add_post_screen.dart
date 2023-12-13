@@ -110,9 +110,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     // Create a PostModel instance with the necessary data
                     PostModel newPost = PostModel(
                       content: 'Post Image',  // Provide the actual content
-                      imageUrl: imageUrl,
-                      timestamp: DateTime.now(),
-                      userId: userId,  // Include the userId
+                      postimageUrl: imageUrl,
+                      posttimestamp: DateTime.now(),
+                      postId: userId,  // Include the userId
                     );
 
                     // Call the addPost function from PostProvider

@@ -8,8 +8,8 @@ import '../models/post_model.dart';
 class PostProvider extends ChangeNotifier {
 
   PostProvider() {  //The constructor initializes postsController as a broadcast stream controller.
-    postsController = StreamController<List<PostModel>>.broadcast();
-    initialize();
+    postsController = StreamController<List<PostModel>>.broadcast();    //we have more than one user so we are using  broadcast streams controller
+    updatePost();
   }
 
   final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
@@ -18,21 +18,28 @@ class PostProvider extends ChangeNotifier {
 
   // Expose the stream to consumers
   Stream<List<PostModel>> get postsStream => postsController.stream; //This declares a getter named postsStream.The return type of the getter is a Stream of lists of PostModel
-                                                                      //It means consumers can listen to this stream to receive updates when the list of posts changes.
 
-  Future<void> initialize() async {
-    await fetchPosts();
-    print('data fetched');
-  }
+
+  // Future<UserProfile> fetchUserProfile(String userId) async {
+  //   // Implement a method to fetch user profile based on userId
+  //   // This could be a call to Firestore or any other method to retrieve user details
+  //   // Example: UserProfile userProfile = await getUserProfileFromFirestore(userId);
+  //   // return userProfile;
+  //   return UserProfile(username: '', profileImageUrl: ''); // Replace with your actual implementation
+  // }
+
+
+
 
   Future<void> addPost(PostModel postModel) async {
     var uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
-      postModel.userId = uid;
+      postModel.postId = uid;
 
       await firestoreInstance.collection('posts').add(postModel.toMap());
       notifyListeners();
+      print("data added");
     } else {
       print("User is not logged in. Cannot add post.");
     }
@@ -46,8 +53,8 @@ class PostProvider extends ChangeNotifier {
 
         firestoreInstance
             .collection('posts')
-            .where('userId', isEqualTo: uid)
-            .snapshots()
+            .where('UserId', isEqualTo: uid)
+            .snapshots()                                       //Specifically, it contains a list of QueryDocumentSnapshot instances, where each QueryDocumentSnapshot represents a document in the query result.
             .listen((QuerySnapshot querySnapshot) {            //It uses a stream to listen for updates to the posts collection.
           posts = querySnapshot.docs
               .map((doc) => PostModel.fromMap(doc.data() as Map<String, dynamic>))
@@ -63,6 +70,12 @@ class PostProvider extends ChangeNotifier {
     } catch (e) {
       print("Error fetching posts: $e");
     }
+  }
+
+  //It means consumers can listen to this stream to receive updates when the list of posts changes.
+  Future<void> updatePost() async {
+    await fetchPosts();
+    print('data fetched');
   }
 
   // Dispose the stream controller when the provider is disposed
