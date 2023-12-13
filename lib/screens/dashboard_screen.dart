@@ -1,14 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:internship_project/Active_screens/home_screen.dart';
+import 'package:internship_project/screens/provider_class.dart';
+import 'package:provider/provider.dart';
 import '../models/model_class.dart';
 import '../Active_screens/Profile_screen.dart';
 
 class DashBoardScreen extends StatefulWidget {
-
   @override
   State<DashBoardScreen> createState() => _DashBoardScreenState();
 }
@@ -25,9 +24,14 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         controller: _pageController,
         children: [
           // Screens corresponding to each tab
-          HomeScreen(),
-          HomeScreen(),
-          HomeScreen(),
+          ChangeNotifierProvider(
+            create: (BuildContext context) {
+              return PostProvider();
+            },
+            child: HomeScreen(),
+          ),
+          Container(),
+          Container(),
           ProfileScreen(),
         ],
         onPageChanged: (index) {
@@ -60,4 +64,3 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     );
   }
 }
-

@@ -1,12 +1,12 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-
+import '../models/post_model.dart';
 import '../screens/provider_class.dart';
 
 class AddPostScreen extends StatefulWidget{
@@ -33,6 +33,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       _selectedImage = File(pickedImage.path);         //The picked image is then stored in the _selectedImage variable
     });
   }
+
   //function for pick image from camera
   Future<void> pickImageFromCamera() async {
     final imagePicker = ImagePicker();
@@ -43,17 +44,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
     }
     setState(() {
       _selectedImage = File(pickedImage.path);         //The picked image is then stored in the _selectedImage variable
-    });
-  }
-
-  //function for uploadImage
-  Future<void> _uploadImage() async {
-    if (_selectedImage == null) {
-      // No image to upload.
-      return;
-    }
-    setState(() {
-      isUploading = true;
     });
   }
 
@@ -79,6 +69,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
     @override
     Widget build(BuildContext context) {
+      final postProvider = Provider.of<PostProvider>(context);
       return Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.amber,
@@ -108,12 +99,26 @@ class _AddPostScreenState extends State<AddPostScreen> {
               ElevatedButton(
                 onPressed: () async {
                   if (_selectedImage != null) {
+
                     String imageName = DateTime.now().millisecondsSinceEpoch.toString();
                     String imageUrl = await uploadImage(_selectedImage!, imageName);
                     print(imageUrl);
 
-                    await Provider.of<PostProvider>(context, listen: false)
-                        .addPost("Post content", imageUrl);
+                    // Get the current user's ID
+                    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+                    // Create a PostModel instance with the necessary data
+                    PostModel newPost = PostModel(
+                      content: 'Post Image',  // Provide the actual content
+                      imageUrl: imageUrl,
+                      timestamp: DateTime.now(),
+                      userId: userId,  // Include the userId
+                    );
+
+                    // Call the addPost function from PostProvider
+                    await postProvider.addPost(newPost);
+                    // // Fetch posts when the widget is built
+                    // postProvider.fetchPosts();
 
                     Navigator.pop(context);
                   } else {

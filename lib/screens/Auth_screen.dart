@@ -8,7 +8,7 @@ import 'package:internship_project/widgets/Button_widget.dart';
 import 'package:internship_project/widgets/textfield_widget.dart';
 
 class AuthScreen extends StatelessWidget {
-  // final auth = FirebaseAuth.instance;
+
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   var email_controller = TextEditingController();
   var password_controller = TextEditingController();

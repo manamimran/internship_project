@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,7 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:internship_project/screens/dashboard_screen.dart';
+import 'package:internship_project/Active_screens/Profile_screen.dart';
 
 import '../models/model_class.dart';
 
@@ -22,13 +23,13 @@ class _ProfileDataState extends State<ProfileData> {
   final auth = FirebaseAuth.instance;
   var name_control = TextEditingController();
   var phone_control = TextEditingController();
-  var image_control = TextEditingController();
   var country_control = TextEditingController();
   // ModelClass?  modelClass;
   XFile? images;
   //pick image function
   final ImagePicker imagePicker = ImagePicker();
   Country? selectedCountry;
+  String imageurl="";
 
   @override
   void initState() {
@@ -36,8 +37,9 @@ class _ProfileDataState extends State<ProfileData> {
     if (widget.modelClass != null) {
       name_control.text = widget.modelClass!.name;
       phone_control.text = widget.modelClass!.phone;
-      image_control.text = widget.modelClass!.image;
       country_control.text = widget.modelClass!.country;
+        imageurl = widget.modelClass!.image;
+      // images = XFile(widget.modelClass!.image);
       super.initState();
     }
   }
@@ -50,22 +52,19 @@ class _ProfileDataState extends State<ProfileData> {
     // File(file.path) converts the XFile to a regular File object to be uploaded.
     final uploadTask = await storageRef.putFile(
         File(file.path),
-        SettableMetadata(
-            contentType:
-                "image/png")); //uploading task refers to task of uploading data to remote server
+        SettableMetadata(contentType: "image/png")); //uploading task refers to task of uploading data to remote server
     if (uploadTask.state == TaskState.success) {
       ///This condition checks if the upload task was successful. If the upload was successful, it means the image is now stored in Firebase Storage.
-      String url = await storageRef.getDownloadURL();
-      return url;
+       imageurl = await storageRef.getDownloadURL();
+
+      return imageurl;
     } else {
       throw PlatformException(code: "404", message: "no download link found");
     }
   }
 
   Future<XFile?> pickImage(ImageSource source) async {
-    XFile? file = await imagePicker.pickImage(
-        source:
-            source); //Xfile is the class in photomanager package of dart and contain information related to assets like file size etc
+    XFile? file = await imagePicker.pickImage(source: source); //Xfile is the class in photomanager package of dart and contain information related to assets like file size etc
     if (file != null) {
       return file;
     } else {
@@ -76,8 +75,7 @@ class _ProfileDataState extends State<ProfileData> {
 
 //select image from gallery
   selectImage() async {
-    XFile? image = await pickImage(ImageSource
-        .gallery); //XFile is used to represent image data into memory
+    XFile? image = await pickImage(ImageSource.gallery); //XFile is used to represent image data into memory
 
     print(images?.mimeType);
     setState(() {
@@ -104,16 +102,14 @@ class _ProfileDataState extends State<ProfileData> {
                     radius: 64,
                     backgroundImage: FileImage(File(images!.path)),
                   )
-                else
+                else if (widget.modelClass != null)
                   CircleAvatar(
                     radius: 64,
-                    backgroundImage: NetworkImage( widget.modelClass?.image ??
-                        "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"),
+                    backgroundImage: NetworkImage(widget.modelClass!.image),
                   ),
                 Positioned(
                   child: IconButton(
-                    onPressed:
-                        selectImage, // Call your selectImage function when the IconButton is pressed.
+                    onPressed: selectImage,
                     icon: Icon(Icons.add_a_photo),
                   ),
                   bottom: -10,
@@ -164,36 +160,55 @@ class _ProfileDataState extends State<ProfileData> {
                   ),
 
                   SizedBox(height: 20),
-                  ElevatedButton(onPressed: () async {
+                  ElevatedButton(
+                    onPressed: () async {
+                      var uid = FirebaseAuth.instance.currentUser!.uid;
+                      final doc = FirebaseFirestore.instance.collection("usersData").doc(uid);
 
-                    var uid = FirebaseAuth.instance.currentUser!.uid;
-                    final doc = FirebaseFirestore.instance.collection("usersData").doc(uid);
+                      if (images != null && widget.modelClass == null) {
+                        //handle the case when images are not null and modelClass is null
+                        final url = await uploadImage(images!, doc.id);
 
-                    // Check if an image has been selected
-                    if (images != null) {
-                      final url = await uploadImage(images!, doc.id);
-                      print(url);
-                      //  print("url is here");
+                        final modelclass = ModelClass(
+                          uid: doc.id,
+                          name: name_control.text,
+                          phone: phone_control.text,
+                          country: country_control.text,
+                          image: url,
+                        );
 
-                      final modelclass = ModelClass(
-                        uid: doc.id,
-                        name: name_control.text,
-                        phone: phone_control.text,
-                        country: country_control.text,
-                        image: url
+                        await doc.set(modelclass.toMap());
+                        print("Data set successfully");
+                      }  else if (widget.modelClass != null) {
+                        //handle the case when modelClass is not null
+                        String imageUrl = widget.modelClass!.image;
+
+                        // Check if a new image is selected
+                        if (images != null) {
+                          // Upload a new image and get the new URL
+                          imageUrl = await uploadImage(images!, doc.id);
+                        }
+
+                        // Update Firestore document with the new data and image URL
+                        final modelclass = ModelClass(
+                          uid: doc.id,
+                          name: name_control.text,
+                          phone: phone_control.text,
+                          country: country_control.text,
+                          image: imageUrl,
+                        );
+
+                        await doc.set(modelclass.toMap());
+                        print("Data updated successfully");
+                      }
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfileScreen()),
+                            (route) => false, // This removes all routes from the stack
                       );
-
-                      // Save the UserModel to Firestore
-                      await doc.set(modelclass.toMap());
-                       print("set data");
-
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  DashBoardScreen()));
-                    }
-                  }, child: Text('Save'))
+                    },
+                    child: Text('Save'),
+                  )
                 ],
               ),
             )
