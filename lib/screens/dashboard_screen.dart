@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:internship_project/Active_screens/chat_screen.dart';
 import 'package:internship_project/Active_screens/home_screen.dart';
-import 'package:internship_project/screens/provider_class.dart';
+import 'package:internship_project/Active_screens/search_screen.dart';
+import 'package:internship_project/providers/post_provider.dart';
+import 'package:internship_project/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import '../models/model_class.dart';
 import '../Active_screens/Profile_screen.dart';
@@ -14,14 +17,14 @@ class DashBoardScreen extends StatefulWidget {
 
 class _DashBoardScreenState extends State<DashBoardScreen> {
   int _currentIndex = 0;
-  PageController _pageController = PageController();
+  PageController pageController = PageController();
   ModelClass? modelClass;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
-        controller: _pageController,
+        controller: pageController,
         children: [
           // Screens corresponding to each tab
           ChangeNotifierProvider(
@@ -30,8 +33,12 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
             },
             child: HomeScreen(),
           ),
-          Container(),
-          Container(),
+          ChatScreen(),
+          ChangeNotifierProvider(
+              create: (BuildContext context) {
+                return UserProvider();
+              },
+              child: SearchScreen()),
           ProfileScreen(),
         ],
         onPageChanged: (index) {
@@ -54,7 +61,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           setState(() {
             _currentIndex = index;
           });
-          _pageController.animateToPage(
+          pageController.animateToPage(
             index,
             duration: Duration(milliseconds: 300),
             curve: Curves.easeInOut,

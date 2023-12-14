@@ -7,7 +7,7 @@ import '../models/post_model.dart';
 
 class PostProvider extends ChangeNotifier {
 
-  PostProvider() {  //The constructor initializes postsController as a broadcast stream controller.
+  PostProvider() {                                                  //The constructor initializes postsController as a broadcast stream controller.
     postsController = StreamController<List<PostModel>>.broadcast();    //we have more than one user so we are using  broadcast streams controller
     updatePost();
   }
@@ -20,15 +20,13 @@ class PostProvider extends ChangeNotifier {
   Stream<List<PostModel>> get postsStream => postsController.stream; //This declares a getter named postsStream.The return type of the getter is a Stream of lists of PostModel
 
 
-  // Future<UserProfile> fetchUserProfile(String userId) async {
+  // Future<UserProfileModel> fetchUserProfile(String userId) async {
   //   // Implement a method to fetch user profile based on userId
   //   // This could be a call to Firestore or any other method to retrieve user details
   //   // Example: UserProfile userProfile = await getUserProfileFromFirestore(userId);
   //   // return userProfile;
-  //   return UserProfile(username: '', profileImageUrl: ''); // Replace with your actual implementation
+  //   return UserProfileModel(username: '', profileImageUrl: '', uid: ''); // Replace with your actual implementation
   // }
-
-
 
 
   Future<void> addPost(PostModel postModel) async {
@@ -78,6 +76,23 @@ class PostProvider extends ChangeNotifier {
     print('data fetched');
   }
 
+  // Future<UserProfileModel?> getUserProfile(PostModel postModel) async {
+  //   try {
+  //     // Assuming "usersData" is the collection where user profiles are stored
+  //     final DocumentSnapshot<Map<String, dynamic>> snapshot =
+  //     await FirebaseFirestore.instance.collection("usersData").doc(postModel.postId).get();
+  //
+  //     if (snapshot.exists) {
+  //       return UserProfileModel.fromMap(snapshot.data()!);
+  //     } else {
+  //       print("User profile not found for postId");
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     print("Error fetching user profile: $error");
+  //     return null;
+  //   }
+  // }
   // Dispose the stream controller when the provider is disposed
   @override
   void dispose() {
@@ -85,5 +100,8 @@ class PostProvider extends ChangeNotifier {
     super.dispose();
   }
 }
+
+
+
 
 

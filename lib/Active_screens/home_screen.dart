@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:internship_project/models/post_model.dart';
 import 'package:provider/provider.dart';
-import '../screens/provider_class.dart';
+import '../providers/post_provider.dart';
 import 'add_post_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -32,11 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: ListView.builder(
                       itemCount: postProvider.posts.length,
                       itemBuilder: (context, index) {
-                        String imageUrl = postProvider.posts[index].postimageUrl;
-                        // String userId = postProvider.posts[index].userId;
-
-                        return Container(padding: EdgeInsets.all(10),
-                            child: PostWidget(imageUrl));
+                        // Pass the current PostModel to the PostWidget
+                        PostModel currentPost = postProvider.posts[index];
+                        return Container(
+                            padding: EdgeInsets.all(20),
+                        child: PostWidget(currentPost),
+                        );
                       },
                     ),
                   ),
@@ -69,20 +71,31 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget PostWidget(String imageUrl) {
+  Widget PostWidget(PostModel postModel) {
     return Container(padding: EdgeInsets.only(top:80 ,bottom: 50,right: 20,left: 20),
       decoration: BoxDecoration(
-        color: Colors.grey, // Set your desired background color
+        color: Colors.black12, // Set your desired background color
         borderRadius:
             BorderRadius.circular(20.0), // Set your desired border radius
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(imageUrl),
-          // Text('User ID: $userId'),
+          //User's profile details
+          // ListTile(
+          //   leading: CircleAvatar(
+          //     backgroundImage: NetworkImage(postModel.userProfile.profileImageUrl),
+          //   ),
+          //   title: Text(postModel.userProfile.username),
+          // ),
+          SizedBox(height: 10),
+          // Post details
+          Image.network(postModel.postimageUrl),
+          SizedBox(height: 10),
           // You can add more widgets or customize as needed
         ],
       ),
     );
   }
+
 }

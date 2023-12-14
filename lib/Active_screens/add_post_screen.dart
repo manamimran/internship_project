@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../models/model_class.dart';
 import '../models/post_model.dart';
-import '../screens/provider_class.dart';
+import '../providers/post_provider.dart';
 
 class AddPostScreen extends StatefulWidget{
   @override
@@ -107,12 +108,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     // Get the current user's ID
                     String userId = FirebaseAuth.instance.currentUser!.uid;
 
+
                     // Create a PostModel instance with the necessary data
                     PostModel newPost = PostModel(
-                      content: 'Post Image',  // Provide the actual content
                       postimageUrl: imageUrl,
                       posttimestamp: DateTime.now(),
-                      postId: userId,  // Include the userId
+                      postId: userId,
+
                     );
 
                     // Call the addPost function from PostProvider

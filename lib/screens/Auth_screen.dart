@@ -8,7 +8,6 @@ import 'package:internship_project/widgets/Button_widget.dart';
 import 'package:internship_project/widgets/textfield_widget.dart';
 
 class AuthScreen extends StatelessWidget {
-
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   var email_controller = TextEditingController();
   var password_controller = TextEditingController();
@@ -53,7 +52,8 @@ class AuthScreen extends StatelessWidget {
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ProfileData(modelClass: modelClass)),
+                                builder: (context) =>
+                                    ProfileData(modelClass: modelClass)),
                             (route) => false);
                       });
                     } catch (e) {
@@ -76,7 +76,8 @@ class AuthScreen extends StatelessWidget {
                           .signInWithEmailAndPassword(
                         email: email_controller.text,
                         password: password_controller.text,
-                      ).then((value) {
+                      )
+                          .then((value) {
                         print("SignIn successfully");
 
                         Navigator.pushAndRemoveUntil(
