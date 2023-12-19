@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:internship_project/providers/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -11,28 +11,43 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  TextEditingController searchController = TextEditingController();
+  List<ModelClass> filteredUsers = [];     //This list is used to store the users that match the search criteria.
 
   @override
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
-
         return Scaffold(
           appBar: AppBar(
-            title: Text('Search Screen'),
+            title: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: 'Search',
+                border: InputBorder.none,
+              ),
+              onChanged: (query) {   //The parameter query represents the current text value entered by the user in the search bar.
+                // Handle search as the user types
+                filterUsers(userProvider.allUserData, query);
+              },
+            ),
             backgroundColor: Colors.amber,
           ),
-          body: ListView.builder(
-            itemCount: userProvider.allUserData.length,
+          body: ListView.separated(   // ListView. separated(), which lets you add a separator to each item,
+            itemCount: filteredUsers.length,
+            separatorBuilder: (context, index) => Divider(),
             itemBuilder: (context, index) {
-              ModelClass user = userProvider.allUserData[index];
+              ModelClass user = filteredUsers[index];
               return ListTile(
                 leading: CircleAvatar(
                   backgroundImage: NetworkImage(user.image),
                 ),
                 title: Text(user.name),
-                subtitle:
-                    Text('Phone: ${user.phone}, Country: ${user.country}'),
+                trailing: ElevatedButton(
+                  onPressed: () async {
+
+                  }, child: Text('Send Request'),
+                ),
                 // Add more details as needed
               );
             },
@@ -40,5 +55,13 @@ class _SearchScreenState extends State<SearchScreen> {
         );
       },
     );
+  }
+
+  void filterUsers(List<ModelClass> allUserData, String query) {       //It updates the filteredUsers list with users whose names contain the search query (case-insensitive).
+    setState(() {
+      filteredUsers = allUserData
+          .where((user) => user.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 }

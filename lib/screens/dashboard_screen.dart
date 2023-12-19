@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:internship_project/Active_screens/chat_screen.dart';
@@ -16,37 +15,13 @@ class DashBoardScreen extends StatefulWidget {
 }
 
 class _DashBoardScreenState extends State<DashBoardScreen> {
-  int _currentIndex = 0;
-  PageController pageController = PageController();
-  ModelClass? modelClass;
+  int currentIndex = 0;
+  List<Widget> screens = [HomeScreen(), ChatScreen(), SearchScreen(), ProfileScreen()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: pageController,
-        children: [
-          // Screens corresponding to each tab
-          ChangeNotifierProvider(
-            create: (BuildContext context) {
-              return PostProvider();
-            },
-            child: HomeScreen(),
-          ),
-          ChatScreen(),
-          ChangeNotifierProvider(
-              create: (BuildContext context) {
-                return UserProvider();
-              },
-              child: SearchScreen()),
-          ProfileScreen(),
-        ],
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
+      body: screens[currentIndex],
       bottomNavigationBar: GNav(
         backgroundColor: Colors.amber,
         color: Colors.white,
@@ -56,16 +31,11 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           GButton(icon: Icons.search, text: "Search"),
           GButton(icon: Icons.person, text: "Profile"),
         ],
-        selectedIndex: _currentIndex,
+        selectedIndex: currentIndex,
         onTabChange: (index) {
           setState(() {
-            _currentIndex = index;
+            currentIndex = index;
           });
-          pageController.animateToPage(
-            index,
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
         },
       ),
     );

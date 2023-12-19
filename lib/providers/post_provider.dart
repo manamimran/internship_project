@@ -15,29 +15,23 @@ class PostProvider extends ChangeNotifier {
   final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
   List<PostModel> posts = [];
   late StreamController<List<PostModel>> postsController;  //StreamController responsible for managing a broadcast stream of lists of PostModel.
+  bool isLoading = false; // Add this property to track loading state
 
   // Expose the stream to consumers
-  Stream<List<PostModel>> get postsStream => postsController.stream; //This declares a getter named postsStream.The return type of the getter is a Stream of lists of PostModel
-
-
-  // Future<UserProfileModel> fetchUserProfile(String userId) async {
-  //   // Implement a method to fetch user profile based on userId
-  //   // This could be a call to Firestore or any other method to retrieve user details
-  //   // Example: UserProfile userProfile = await getUserProfileFromFirestore(userId);
-  //   // return userProfile;
-  //   return UserProfileModel(username: '', profileImageUrl: '', uid: ''); // Replace with your actual implementation
-  // }
+  Stream<List<PostModel>> get postsStream => postsController.stream;
+  final CollectionReference<Map<String, dynamic>> postCollection = FirebaseFirestore.instance.collection('posts');
 
 
   Future<void> addPost(PostModel postModel) async {
     var uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
+      isLoading = true; // Set loading state to true before fetching
       postModel.postId = uid;
 
-      await firestoreInstance.collection('posts').add(postModel.toMap());
+      await postCollection.add(postModel.toMap());
       notifyListeners();
-      print("data added");
+      // print("data added");
     } else {
       print("User is not logged in. Cannot add post.");
     }
@@ -49,18 +43,18 @@ class PostProvider extends ChangeNotifier {
 
       if (uid != null) {
 
-        firestoreInstance
-            .collection('posts')
-            .where('UserId', isEqualTo: uid)
+        postCollection
+            .where('PostId', isEqualTo: uid)
             .snapshots()                                       //Specifically, it contains a list of QueryDocumentSnapshot instances, where each QueryDocumentSnapshot represents a document in the query result.
             .listen((QuerySnapshot querySnapshot) {            //It uses a stream to listen for updates to the posts collection.
           posts = querySnapshot.docs
               .map((doc) => PostModel.fromMap(doc.data() as Map<String, dynamic>))
               .toList();
-          // Notify listeners about the change
+          // // Notify listeners about the change
           notifyListeners();
           // Add the updated posts list to the stream
           postsController.add(posts);
+          isLoading = false; // Set loading state to false after fetching
         });
       } else {
         print("User is not logged in. Cannot fetch posts.");
@@ -76,23 +70,21 @@ class PostProvider extends ChangeNotifier {
     print('data fetched');
   }
 
-  // Future<UserProfileModel?> getUserProfile(PostModel postModel) async {
-  //   try {
-  //     // Assuming "usersData" is the collection where user profiles are stored
-  //     final DocumentSnapshot<Map<String, dynamic>> snapshot =
-  //     await FirebaseFirestore.instance.collection("usersData").doc(postModel.postId).get();
-  //
-  //     if (snapshot.exists) {
-  //       return UserProfileModel.fromMap(snapshot.data()!);
-  //     } else {
-  //       print("User profile not found for postId");
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     print("Error fetching user profile: $error");
-  //     return null;
-  //   }
-  // }
+  bool likePost(String userId, String postId) {
+    postCollection.doc(postId).update({
+      'LikedPosts': FieldValue.arrayUnion([userId])
+    });
+    return true;
+  }
+
+  void unlikePost(String userId, String postId) {
+    postCollection.doc(postId).update({
+      'LikedPosts': FieldValue.arrayRemove([userId])
+    }).then((_) {
+      notifyListeners();
+    });
+  }
+
   // Dispose the stream controller when the provider is disposed
   @override
   void dispose() {

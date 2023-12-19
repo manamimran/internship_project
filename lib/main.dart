@@ -21,8 +21,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<PostProvider>(create:(_)=>PostProvider()),
-        Provider<UserProvider>(create:(_)=>UserProvider()),
+        ChangeNotifierProvider(create:(_)=>PostProvider()),
+        ChangeNotifierProvider(create:(_)=>UserProvider()),
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -31,8 +31,18 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             useMaterial3: true,
           ),
-          home: DashBoardScreen(),
+          home: Landing(),
       ),
       );
   }
 }
+
+class Landing extends StatelessWidget {
+  const Landing({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return DashBoardScreen();
+  }
+}
+

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../models/model_class.dart';
 import '../models/post_model.dart';
 import '../providers/post_provider.dart';
 
@@ -108,19 +107,16 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     // Get the current user's ID
                     String userId = FirebaseAuth.instance.currentUser!.uid;
 
-
                     // Create a PostModel instance with the necessary data
-                    PostModel newPost = PostModel(
+                    PostModel postModel = PostModel(
                       postimageUrl: imageUrl,
                       posttimestamp: DateTime.now(),
                       postId: userId,
-
+                      likedPosts: [],
                     );
 
                     // Call the addPost function from PostProvider
-                    await postProvider.addPost(newPost);
-                    // // Fetch posts when the widget is built
-                    // postProvider.fetchPosts();
+                    await postProvider.addPost(postModel);
 
                     Navigator.pop(context);
                   } else {
