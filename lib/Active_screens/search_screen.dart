@@ -57,10 +57,10 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  void filterUsers(List<ModelClass> allUserData, String query) {       //It updates the filteredUsers list with users whose names contain the search query (case-insensitive).
+  void filterUsers(List<ModelClass> allUserData, String query) {      //It updates the filteredUsers list with users whose names contain the search query (case-insensitive).
     setState(() {
       filteredUsers = allUserData
-          .where((user) => user.name.toLowerCase().contains(query.toLowerCase()))
+          .where((modelClass) => modelClass.name.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }

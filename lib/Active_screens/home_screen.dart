@@ -15,6 +15,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController commentController = TextEditingController(); //controller for add comment
+  final currentUser = FirebaseAuth.instance.currentUser!; //current user available
+
   @override
   Widget build(BuildContext context) {
     return Consumer<CommentProvider>(//consumer for userprovider
@@ -57,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                           modelClass.uid ==
                                           currentPost
                                               .userId) // filter from list of all users list from user provider
-
                                   : null;
                               return Container(
                                 padding: EdgeInsets.all(20),
@@ -65,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     //showing post widget
                                     currentPost,
                                     userdata,
-                                    postProvider,commentProvider),
+                                    postProvider,commentProvider,userProvider),
                               );
                             },
                           ),
@@ -99,59 +101,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget PostWidget(
-      PostModel postModel, ModelClass? modelClass, PostProvider postProvider,CommentProvider commentProvider){
-    TextEditingController commentController = TextEditingController(); //controller for add comment
-    final currentUser = FirebaseAuth.instance.currentUser!; //current user available
+      PostModel postModel,
+      ModelClass? modelClass,
+      PostProvider postProvider,
+      CommentProvider commentProvider,UserProvider userProvider){
+
     bool isLiked; //isLiked variable
-    isLiked = postModel.likedPosts.contains(currentUser.uid); // checking whether the currentUser.uid is present in the likedPosts list of a postModel
-    //It returns true if the uid is found in the list; otherwise, it returns false.
-    void showCommentDialog(
-      BuildContext context,
-      String postId,
-      String userId,
-     CommentProvider commentProvider
-    ) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: Colors.amber,
-            title: Text('Add Comment'),
-            content: TextField(
-              controller: commentController,
-              decoration: InputDecoration(hintText: 'comment'),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Close the dialog
-                },
-                child: Text('Cancel', style: TextStyle(color: Colors.black)),
-              ),
-              TextButton(
-                onPressed: () {
-
-                  //adding comment via comment model class
-                  CommentModel commentModel = CommentModel(
-                      id: '', // You can generate or obtain a unique ID for the comment
-                      postId: postId,
-                      comment: commentController.text,
-                      timestamp: DateTime.now(),
-                      user: currentUser.uid);
-
-                  // Save the comment
-                  commentProvider.addCommentForPost(postId,commentModel); //saving comment in firestore in separate collection
-                  Navigator.pop(context); // Close the dialog
-                },
-                child:
-                    Text('Add Comment', style: TextStyle(color: Colors.black)),
-              ),
-            ],
-          );
-        },
-      );
-    }
-
+    isLiked = postModel.likedPosts.contains(currentUser.uid); // checking whether the currentUser.uid is present in the likedPosts list of a postModel'
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -202,8 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             // Like the post
                             postProvider.likePost(
                                 modelClass!.uid,
-                                postModel
-                                    .postId); //saving likes wrt to user id in firestore
+                                postModel.postId); //saving likes wrt to user id in firestore
                           }
                           isLiked = !isLiked;
                         });
@@ -222,55 +177,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: EdgeInsets.only(bottom: 12),
                   child: InkWell(
                     onTap: () async {
-                      // Fetch comments for the specific post
-                      List<CommentModel> comments =
-                      await commentProvider.getCommentsForPost(postModel.postId);
-                      // Open the dialog with comments
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            backgroundColor: Colors.amber,
-                            title: Text('Comments'),
-                            content: Container(
-                              child: ListView.builder(
-                                itemCount: comments.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  // Display each comment in the list
-                                  return ListTile(
-                                    title: Container(
-                                      padding: EdgeInsets.all(8.0),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors
-                                              .black, // Set the border color
-                                          width: 1.0, // Set the border width
-                                        ),
-                                        borderRadius: BorderRadius.circular(
-                                            10), // Set the border radius
-                                      ),
-                                      child: Text(
-                                        comments[index].comment,
-                                        style: TextStyle(fontSize: 16.0),
-                                        // Adjust the font size as needed
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context); // Close the dialog
-                                },
-                                child: Text('Close',
-                                    style: TextStyle(color: Colors.black)),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      // Show the comment dialog
+                      showCommentDialog2(context, postModel.postId, modelClass!.uid, commentProvider,userProvider);
                     },
                     child: Icon(Icons.comment),
                   ),
@@ -340,4 +248,114 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  // Method to add the comment dialog
+  void showCommentDialog(
+      BuildContext context,
+      String postId,
+      String userId,
+      CommentProvider commentProvider
+      ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.amber,
+          title: Text('Add Comment'),
+          content: TextField(
+            controller: commentController,
+            decoration: InputDecoration(hintText: 'comment'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('Cancel', style: TextStyle(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () {
+
+                //adding comment via comment model class
+                CommentModel commentModel = CommentModel(
+                    id: '', // You can generate or obtain a unique ID for the comment
+                    postId: postId,
+                    comment: commentController.text,
+                    timestamp: DateTime.now(),
+                    user: currentUser.uid);
+
+                // Save the comment
+                commentProvider.addCommentForPost(postId,commentModel); //saving comment in firestore in separate collection
+                Navigator.pop(context); // Close the dialog
+              },
+              child:
+              Text('Add Comment', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Method to show the comment dialog
+  void showCommentDialog2(BuildContext context,
+      String postId,
+      String userId,
+      CommentProvider commentProvider, UserProvider userProvider)
+  async {
+    List<CommentModel> comments = await commentProvider.getCommentsForPost(postId);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.amber,
+          title: Text('Comments'),
+          content: Container(
+            height: 400,
+            child: ListView.builder(
+              itemCount: comments.length,
+              itemBuilder: (BuildContext context, int index) {
+                // Display each comment in the list
+                return ListTile(
+                  leading: Column(
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(userProvider.getUserData(userId).image),
+                      ),
+                      Text(userProvider.getUserData(userId).name)
+                    ],
+                  ),
+                  title: Container(
+                    padding: EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.black,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      comments[index].comment,
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Close', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 }

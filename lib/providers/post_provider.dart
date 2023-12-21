@@ -49,7 +49,6 @@ class PostProvider extends ChangeNotifier {
       var uid = FirebaseAuth.instance.currentUser?.uid;
 
       if (uid != null) {
-
         postCollection
             .where('UserId', isEqualTo: uid)              //fetch profile info of user who make the post
             // .orderBy('Timetamp', descending: true)

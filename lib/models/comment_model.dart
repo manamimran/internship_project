@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:internship_project/models/model_class.dart';
-
 
 class CommentModel {
   late String id;
@@ -8,7 +6,6 @@ class CommentModel {
   late String comment;
   late DateTime timestamp;
   late String user;
-  ModelClass? userDetails; // Add this field to store user details
 
   CommentModel({
     required this.id,
@@ -16,7 +13,6 @@ class CommentModel {
     required this.comment,
     required this.timestamp,
     required this.user,
-    this.userDetails, // Add this line
   });
 
   CommentModel.fromMap(Map<String, dynamic> data) {
@@ -37,8 +33,5 @@ class CommentModel {
     };
   }
 
-  // Function to set user details
-  void setUserDetails(ModelClass user) {
-    userDetails = user;
-  }
+
 }
