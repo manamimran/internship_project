@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-
 import '../models/model_class.dart';
 
 class UserProvider extends ChangeNotifier {
@@ -16,7 +15,7 @@ class UserProvider extends ChangeNotifier {
   List<ModelClass> allUserData = [];
   late StreamController<List<ModelClass>> usersController;
 
-  Stream<List<ModelClass>> get usersStream => usersController.stream;
+  // Stream<List<ModelClass>> get usersStream => usersController.stream;
 
   Future<void> getAllUserData() async {
     try {

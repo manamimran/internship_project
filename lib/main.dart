@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:internship_project/providers/comment_provider.dart';
 import 'package:internship_project/providers/user_provider.dart';
 import 'package:internship_project/screens/dashboard_screen.dart';
 import 'package:internship_project/providers/post_provider.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create:(_)=>PostProvider()),
         ChangeNotifierProvider(create:(_)=>UserProvider()),
+        ChangeNotifierProvider(create: (_)=>CommentProvider()),
       ],
       child: MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -31,18 +33,11 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             useMaterial3: true,
           ),
-          home: Landing(),
+          home: DashBoardScreen(),
       ),
       );
   }
 }
 
-class Landing extends StatelessWidget {
-  const Landing({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return DashBoardScreen();
-  }
-}
 

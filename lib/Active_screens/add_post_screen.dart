@@ -1,17 +1,23 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+import '../models/model_class.dart';
 import '../models/post_model.dart';
 import '../providers/post_provider.dart';
 
 class AddPostScreen extends StatefulWidget{
+
+
   @override
   State<AddPostScreen> createState() => _AddPostScreenState();
+
 }
 
 class _AddPostScreenState extends State<AddPostScreen> {
@@ -19,7 +25,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
   bool isUploading = false;                    // A boolean flag to track whether an image is currently being uploaded.
   //pick image function
   final ImagePicker imagePicker = ImagePicker();
-
+  ModelClass? modelClass;
 
   //function for pick image from gallery
   Future<void> pickImageFromGallery() async {
@@ -104,19 +110,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     String imageUrl = await uploadImage(_selectedImage!, imageName);
                     print(imageUrl);
 
-                    // Get the current user's ID
-                    String userId = FirebaseAuth.instance.currentUser!.uid;
-
-                    // Create a PostModel instance with the necessary data
-                    PostModel postModel = PostModel(
-                      postimageUrl: imageUrl,
-                      posttimestamp: DateTime.now(),
-                      postId: userId,
-                      likedPosts: [],
-                    );
-
                     // Call the addPost function from PostProvider
-                    await postProvider.addPost(postModel);
+                    await postProvider.addPost(imageUrl);
 
                     Navigator.pop(context);
                   } else {

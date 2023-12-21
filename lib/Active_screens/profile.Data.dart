@@ -219,10 +219,4 @@ class _ProfileDataState extends State<ProfileData> {
     );
   }
 }
-// ElevatedButton(onPressed: (){
-//   auth.signOut();
-//   print('Signed Out Successfully');
-//
-//   Navigator.push(context,
-//       MaterialPageRoute(builder: (context) => HomeScreen()));
-// }, child: Text("Logout"))
+

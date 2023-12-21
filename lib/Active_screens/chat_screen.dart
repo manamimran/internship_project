@@ -25,11 +25,9 @@ class ChatScreen extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ChangeNotifierProvider(
-                              create: (BuildContext context) {
-                                return UserProvider();
-                              },
-                              child: SearchScreen())));
+                          builder:
+                              (context) =>
+                         SearchScreen()));
                 },
                 child: Icon(Icons.add),
                 backgroundColor: Colors.amber,
