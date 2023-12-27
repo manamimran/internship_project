@@ -13,13 +13,12 @@ class PostProvider extends ChangeNotifier {
     updatePost();
   }
 
-  // final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
   List<PostModel> posts = [];
   late StreamController<List<PostModel>> postsController;  //StreamController responsible for managing a broadcast stream of lists of PostModel.
   bool isLoading = false; // Add this property to track loading state
 
   // Expose the stream to consumers
-  // Stream<List<PostModel>> get postsStream => postsController.stream;
+  Stream<List<PostModel>> get postsStream => postsController.stream;
   final CollectionReference<Map<String, dynamic>> postCollection = FirebaseFirestore.instance.collection('posts');
 
   Future<void> addPost(String imageUrl) async {
@@ -30,8 +29,8 @@ class PostProvider extends ChangeNotifier {
 
       var doc = postCollection.doc();
       PostModel postModel = PostModel(
-        postimageUrl: imageUrl,
-        posttimestamp: DateTime.now(),
+        postImageUrl: imageUrl,
+        postTimestamp: DateTime.now(),
         postId:doc.id,
         likedPosts: [],
         userId: uid,
@@ -50,7 +49,7 @@ class PostProvider extends ChangeNotifier {
 
       if (uid != null) {
         postCollection
-            .where('UserId', isEqualTo: uid)              //fetch profile info of user who make the post
+            .where('UserId', isEqualTo: uid)              //fetch profile info of user who make the post only logged_in user
             // .orderBy('Timetamp', descending: true)
             .snapshots()                                       //Specifically, it contains a list of QueryDocumentSnapshot instances, where each QueryDocumentSnapshot represents a document in the query result.
             .listen((QuerySnapshot querySnapshot) {            //It uses a stream to listen for updates to the posts collection.
@@ -101,7 +100,7 @@ class PostProvider extends ChangeNotifier {
     print("unlike");
     postCollection.doc(PostId).update({
       'LikedPosts': FieldValue.arrayRemove([UserId])
-    }).then((_) {
+    }).then((_) {   //This section is a callback function that executes after the Firestore update is complete.
       notifyListeners();
     });
   }
@@ -119,25 +118,6 @@ class PostProvider extends ChangeNotifier {
       print("Error adding comment: $error");
     }
   }
-
-  // Future<List<CommentModel>> getCommentsForPost(String postId) async {
-  //   try {
-  //     final querySnapshot = await postCollection
-  //         .doc(postId) //fetching all comment on specific post
-  //         .collection('comments')
-  //         .get();
-  //
-  //    // Map the query snapshot to a list of CommentModel
-  //     final List<CommentModel> comments = querySnapshot.docs.map((doc) {   //list of commment retrived from firestore t mdel class
-  //       return CommentModel.fromMap(doc.data() as Map<String, dynamic>);
-  //     }).toList();
-  //
-  //     return comments;
-  //   } catch (error) {
-  //     print("Error getting comments for post: $error");
-  //     return [];
-  //   }
-  // }
 
   // Dispose the stream controller when the provider is disposed
   @override

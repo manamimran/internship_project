@@ -1,21 +1,27 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import '../models/model_class.dart';
+import '../models/user_model.dart';
 
 class UserProvider extends ChangeNotifier {
+
   UserProvider() {
-    usersController = StreamController<List<ModelClass>>.broadcast();
+    usersController = StreamController<List<UserModel>>.broadcast();
     updateUser();
     print('List of all Users');
   }
 
   final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
-  List<ModelClass> allUserData = [];
-  late StreamController<List<ModelClass>> usersController;
+  var currentUser = FirebaseAuth.instance.currentUser?.uid;   //current loginin user id
 
-  // Stream<List<ModelClass>> get usersStream => usersController.stream;
+  List<UserModel> allUserData = [];
+  // List of friends for the current user
+  List<String> friends = [];
+  late StreamController<List<UserModel>> usersController;
+
+  Stream<List<UserModel>> get usersStream => usersController.stream;
+
 
   Future<void> getAllUserData() async {
     try {
@@ -25,9 +31,10 @@ class UserProvider extends ChangeNotifier {
       if (snapshot.docs.isNotEmpty) {
         allUserData = snapshot.docs
             .map((doc) =>
-            ModelClass.fromMap(doc.data() as Map<String, dynamic>))
+            UserModel.fromMap(doc.data() as Map<String, dynamic>))
             .toList();
-
+         print(allUserData.length);
+         print("all users");
         notifyListeners();
         usersController.add(allUserData);
       } else {
@@ -38,69 +45,85 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  UserModel? getUser(String id){
+    UserModel? userModel;
+
+    userModel = allUserData.where((element) => element.uid == id).firstOrNull;
+    return userModel;
+  }
+
   Future<void> updateUser() async {
+    currentUser = FirebaseAuth.instance.currentUser!.uid;
     await getAllUserData();
   }
 
-  ModelClass getUserData(String UserId) {
-    return allUserData.where((modelClass) => modelClass.uid == UserId).toList().first;
+
+  // Method to check if a user is a friend
+  bool isFriend(String userId) {
+    return friends.contains(userId);
   }
 
-  // Future<void> sendFriendRequest(ModelClass sender, ModelClass recipient) async {
-  //   try {
-  //     // Assume you have a "friendRequests" collection in Firestore
-  //     await firestoreInstance.collection("friendRequests").add({
-  //       'senderId': sender.uid,
-  //       'recipientId': recipient.uid,
-  //       'timestamp': FieldValue.serverTimestamp(),
-  //     });
-  //     print('Friend request sent from ${sender.name} to ${recipient.name}');
-  //   } catch (error) {
-  //     print("Error sending friend request: $error");
-  //   }
-  // }
+  Future<void> sendFriendRequest(UserModel other, UserModel current) async {
+    try {
+      // Update the receiver's friend requests
+      await firestoreInstance.collection("usersData").doc(currentUser).update({
+        'SendRequest': FieldValue.arrayUnion([other.uid]),
+      });
 
-  // Future<bool> hasSentFriendRequest(ModelClass sender, ModelClass recipient) async {
-  //   try {
-  //     final QuerySnapshot<Map<String, dynamic>> snapshot = await firestoreInstance
-  //         .collection("friendRequests")
-  //         .where('senderId', isEqualTo: sender.uid)
-  //         .where('recipientId', isEqualTo: recipient.uid)
-  //         .get();
-  //     return snapshot.docs.isNotEmpty;
-  //   } catch (error) {
-  //     print("Error checking friend request: $error");
-  //     return false;
-  //   }
-  // }
+      // Update the sender's friends list
+      await firestoreInstance.collection("usersData").doc(other.uid).update({
+        'GetRequest': FieldValue.arrayUnion([current.uid]),
+      });
+    } catch (e) {
+      print("Error sending friend request: $e");
+    }
+  }
 
-  // Future<void> FriendsAcepted(ModelClass sender, ModelClass recipient) async {
-  //   try {
-  //     // Update friends list for the recipient
-  //     await firestoreInstance.collection("usersData").doc(recipient.uid).update({
-  //       'friends': FieldValue.arrayUnion([sender.uid]),
-  //     });
-  //
-  //     // Update friends list for the sender
-  //     await firestoreInstance.collection("usersData").doc(sender.uid).update({
-  //       'friends': FieldValue.arrayUnion([recipient.uid]),
-  //     });
-  //
-  //     // Remove the friend request
-  //     await firestoreInstance.collection("friendRequests").where('senderId', isEqualTo: sender.uid)
-  //         .where('recipientId', isEqualTo: recipient.uid)
-  //         .get()
-  //         .then((snapshot) {
-  //       for (DocumentSnapshot doc in snapshot.docs) {
-  //         doc.reference.delete();
-  //       }
-  //     });
+  Future<List<String>> getFriendRequests(String uid) async {
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+      await firestoreInstance.collection("usersData").doc(uid).get();
 
-  //     print('Friend request accepted from ${sender.name} by ${recipient.name}');
-  //   } catch (error) {
-  //     print("Error accepting friend request: $error");
-  //   }
-  // }
+      return (snapshot.data()?['GetRequest'] as List<dynamic>? ?? []).cast<String>();
+    } catch (e) {
+      print("Error fetching friend requests: $e");
+      return [];
+    }
+  }
+
+  Future<void> acceptFriendRequest(UserModel other, UserModel current) async {
+  try {
+    await firestoreInstance.collection("usersData").doc(current.uid).update({
+      'GetRequest': FieldValue.arrayRemove([other.uid]),
+      'Friends': FieldValue.arrayUnion([other.uid]),
+    });
+
+    await firestoreInstance.collection("usersData").doc(other.uid).update({
+      'Friends': FieldValue.arrayUnion([current.uid]),
+    });
+  } catch (e) {
+    print("Error accepting friend request: $e");
+  }
+}
+
+  Future<void> rejectFriendRequest(UserModel other, UserModel current) async {
+    try {
+      await firestoreInstance.collection("usersData").doc(current.uid).update({
+        'GetRequest': FieldValue.arrayRemove([other.uid]),
+      });
+    } catch (e) {
+      print("Error rejecting friend request: $e");
+    }
+  }
+  Future<void> unFriend(UserModel other, UserModel current) async {
+    try {
+      await firestoreInstance.collection("usersData").doc(current.uid).update({
+        'Friends': FieldValue.arrayRemove([other.uid]),
+      });
+    } catch (e) {
+      print("Error rejecting friend request: $e");
+    }
+  }
 
   @override
   void dispose() {
@@ -108,3 +131,15 @@ class UserProvider extends ChangeNotifier {
     super.dispose();
   }
 }
+
+// Future<List<String>> friendsList(String uid) async {
+//   try {
+//     final DocumentSnapshot<Map<String, dynamic>> snapshot =
+//     await firestoreInstance.collection("usersData").doc(uid).get();
+//
+//     return (snapshot.data()?['friends'] as List<dynamic>? ?? []).cast<String>();
+//   } catch (e) {
+//     print("Error fetching friends: $e");
+//     return [];
+//   }
+// }

@@ -2,8 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:internship_project/providers/comment_provider.dart';
 import 'package:internship_project/providers/user_provider.dart';
-import 'package:internship_project/screens/dashboard_screen.dart';
 import 'package:internship_project/providers/post_provider.dart';
+import 'package:internship_project/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
@@ -33,7 +33,8 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             useMaterial3: true,
           ),
-          home: DashBoardScreen(),
+          home:
+          SplashScreen()
       ),
       );
   }

@@ -7,38 +7,38 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:internship_project/Active_screens/Profile_screen.dart';
-
-import '../models/model_class.dart';
+import '../models/user_model.dart';
+import 'profile_screen.dart';
 
 class ProfileData extends StatefulWidget {
-  ProfileData({super.key, required this.modelClass});
-  final ModelClass? modelClass;
+  ProfileData({super.key, required this.userModel});
+  UserModel? userModel;
 
   @override
   State<ProfileData> createState() => _ProfileDataState();
+
 }
 
 class _ProfileDataState extends State<ProfileData> {
   final auth = FirebaseAuth.instance;
-  var name_control = TextEditingController();
-  var phone_control = TextEditingController();
-  var country_control = TextEditingController();
+  var nameControl = TextEditingController();
+  var phoneControl = TextEditingController();
+  var countryControl = TextEditingController();
   // ModelClass?  modelClass;
   XFile? images;
   //pick image function
   final ImagePicker imagePicker = ImagePicker();
   Country? selectedCountry;
-  String imageurl="";
+  String imageUrl="";
 
   @override
   void initState() {
     //if model class is not empty  and we are adding data then set data on textfields we created in show data screen(show data widgets)
-    if (widget.modelClass != null) {
-      name_control.text = widget.modelClass!.name;
-      phone_control.text = widget.modelClass!.phone;
-      country_control.text = widget.modelClass!.country;
-        imageurl = widget.modelClass!.image;
+    if (widget.userModel != null) {
+      nameControl.text = widget.userModel!.name;
+      phoneControl.text = widget.userModel!.phone;
+      countryControl.text = widget.userModel!.country;
+        imageUrl = widget.userModel!.image;
       // images = XFile(widget.modelClass!.image);
       super.initState();
     }
@@ -55,9 +55,9 @@ class _ProfileDataState extends State<ProfileData> {
         SettableMetadata(contentType: "image/png")); //uploading task refers to task of uploading data to remote server
     if (uploadTask.state == TaskState.success) {
       ///This condition checks if the upload task was successful. If the upload was successful, it means the image is now stored in Firebase Storage.
-       imageurl = await storageRef.getDownloadURL();
+       imageUrl = await storageRef.getDownloadURL();
 
-      return imageurl;
+      return imageUrl;
     } else {
       throw PlatformException(code: "404", message: "no download link found");
     }
@@ -94,7 +94,7 @@ class _ProfileDataState extends State<ProfileData> {
         child: Column(
           children: [
             SizedBox(height: 100),
-            Text(widget.modelClass == null ? "Add User" : "Update User"),
+            Text(widget.userModel == null ? "Add User" : "Update User"),
             Stack(
               children: <Widget>[
                 if (images != null)
@@ -105,7 +105,7 @@ class _ProfileDataState extends State<ProfileData> {
                 else
                   CircleAvatar(
                     radius: 64,
-                    backgroundImage: NetworkImage( widget.modelClass?.image ??
+                    backgroundImage: NetworkImage( widget.userModel?.image ??
                         "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"),
                   ),
                 Positioned(
@@ -124,19 +124,19 @@ class _ProfileDataState extends State<ProfileData> {
                 children: [
                   SizedBox(height: 10),
                   TextField(
-                    controller: name_control,
+                    controller: nameControl,
                     decoration: InputDecoration(
                         hintText: "Name", border: OutlineInputBorder()),
                   ),
                   SizedBox(height: 10),
                   TextField(
-                    controller: phone_control,
+                    controller: phoneControl,
                     decoration: InputDecoration(
                         hintText: "Phone number", border: OutlineInputBorder()),
                   ),
                   SizedBox(height: 10),
                   TextField(
-                    controller: country_control,
+                    controller: countryControl,
                     decoration: InputDecoration(
                       hintText: 'Country',
                       border: OutlineInputBorder(),
@@ -151,7 +151,7 @@ class _ProfileDataState extends State<ProfileData> {
                         onSelect: (Country country) {
                           setState(() {
                             selectedCountry = country;
-                            country_control.text = country.displayName; // Set the text in the TextField
+                            countryControl.text = country.displayName; // Set the text in the TextField
                           });
                           print('${country.displayName}');
                         },
@@ -166,23 +166,26 @@ class _ProfileDataState extends State<ProfileData> {
                       var uid = FirebaseAuth.instance.currentUser!.uid;
                       final doc = FirebaseFirestore.instance.collection("usersData").doc(uid);
 
-                      if (images != null && widget.modelClass == null) {
+                      if (images != null && widget.userModel == null) {
                         //handle the case when images are not null and modelClass is null
                         final url = await uploadImage(images!, doc.id);
 
-                        final modelclass = ModelClass(
+                        final userModel = UserModel(
                           uid: doc.id,
-                          name: name_control.text,
-                          phone: phone_control.text,
-                          country: country_control.text,
+                          name: nameControl.text,
+                          phone: phoneControl.text,
+                          country: countryControl.text,
+                          sendRequests: [],
+                          getRequests: [],
+                          friends: [],
                           image: url,
                         );
 
-                        await doc.set(modelclass.toMap());
+                        await doc.set(userModel.toMap());
                         print("Data set successfully");
-                      }  else if (widget.modelClass != null) {
+                      }  else if (widget.userModel != null) {
                         //handle the case when modelClass is not null
-                        String imageUrl = widget.modelClass!.image;
+                        String imageUrl = widget.userModel!.image;
 
                         // Check if a new image is selected
                         if (images != null) {
@@ -191,15 +194,18 @@ class _ProfileDataState extends State<ProfileData> {
                         }
 
                         // Update Firestore document with the new data and image URL
-                        final modelclass = ModelClass(
+                        final userModel = UserModel(
                           uid: doc.id,
-                          name: name_control.text,
-                          phone: phone_control.text,
-                          country: country_control.text,
+                          name: nameControl.text,
+                          phone: phoneControl.text,
+                          country: countryControl.text,
+                          sendRequests: [],
+                          getRequests: [],
+                          friends: [],
                           image: imageUrl,
                         );
 
-                        await doc.set(modelclass.toMap());
+                        await doc.set(userModel.toMap());
                         print("Data updated successfully");
                       }
                       Navigator.pushAndRemoveUntil(

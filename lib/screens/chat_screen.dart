@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:internship_project/Active_screens/search_screen.dart';
-import 'package:internship_project/providers/user_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:internship_project/models/user_model.dart';
+import 'package:internship_project/screens/search_screen.dart';
 
 class ChatScreen extends StatelessWidget {
+  UserModel? userModel;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,6 +18,9 @@ class ChatScreen extends StatelessWidget {
           children: [
              SizedBox(
               height: 500),
+            Container(
+              // child: FriendsListWidget(authModel),
+            ),
             Align(
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(
@@ -42,4 +45,20 @@ class ChatScreen extends StatelessWidget {
       ),
     );
   }
+
+  // Widget FriendsListWidget(AuthModel? authModel){
+  //   return Container(
+  //     child: ListView.builder(
+  //       itemCount: authModel!.friends.length,
+  //       itemBuilder: (context, index) {
+  //         String friend = authModel.friends[index];
+  //         // Your widget for each friend
+  //         return ListTile(
+  //           title: Text(friend),
+  //           // Add more details as needed
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 }

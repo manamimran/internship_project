@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import '../models/model_class.dart';
+import '../models/user_model.dart';
 import '../models/post_model.dart';
 import '../providers/post_provider.dart';
 
@@ -25,7 +25,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
   bool isUploading = false;                    // A boolean flag to track whether an image is currently being uploaded.
   //pick image function
   final ImagePicker imagePicker = ImagePicker();
-  ModelClass? modelClass;
+  UserModel? userModel;
 
   //function for pick image from gallery
   Future<void> pickImageFromGallery() async {

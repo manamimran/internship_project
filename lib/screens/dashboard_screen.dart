@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:internship_project/Active_screens/chat_screen.dart';
-import 'package:internship_project/Active_screens/home_screen.dart';
-import 'package:internship_project/Active_screens/search_screen.dart';
-import 'package:internship_project/providers/post_provider.dart';
-import 'package:internship_project/providers/user_provider.dart';
-import 'package:provider/provider.dart';
-import '../models/model_class.dart';
-import '../Active_screens/Profile_screen.dart';
+import 'package:internship_project/screens/search_screen.dart';
+import 'profile_screen.dart';
+import 'chat_screen.dart';
+import 'home_screen.dart';
 
 class DashBoardScreen extends StatefulWidget {
   @override

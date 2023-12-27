@@ -6,13 +6,13 @@ import '../models/comment_model.dart';
 class CommentProvider with ChangeNotifier {
   final CollectionReference<Map<String, dynamic>> postCollection = FirebaseFirestore.instance.collection('posts');
 
-  // final StreamController<List<CommentModel>> _commentsController =
-  // StreamController<List<CommentModel>>.broadcast();
+  final StreamController<List<CommentModel>> _commentsController =
+  StreamController<List<CommentModel>>.broadcast();
   List<CommentModel> comments = [];
   late StreamController<List<CommentModel>> commentsController; //StreamController responsible for managing a broadcast stream of lists of PostModel.
 
   // Expose the stream to consumers
-  // Stream<List<CommentModel>> get commentsStream => _commentsController.stream;
+  Stream<List<CommentModel>> get commentsStream => _commentsController.stream;
 
   // Add a comment for a specific post
   Future<void> addCommentForPost(
@@ -41,7 +41,6 @@ class CommentProvider with ChangeNotifier {
       comments = querySnapshot.docs.map((doc) {
         return CommentModel.fromMap(doc.data() as Map<String, dynamic>);
       }).toList();
-
       return comments;
     } catch (error) {
       print("Error getting comments for post: $error");

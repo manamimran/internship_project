@@ -1,17 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:internship_project/Active_screens/Profile_screen.dart';
-import 'package:internship_project/models/model_class.dart';
-import 'package:internship_project/Active_screens/profile.Data.dart';
-import 'package:internship_project/widgets/Button_widget.dart';
+import 'package:internship_project/models/user_model.dart';
+import 'package:internship_project/providers/post_provider.dart';
+import 'package:internship_project/providers/user_provider.dart';
+import 'package:internship_project/screens/profile.data.dart';
+import 'package:internship_project/widgets/button_widget.dart';
 import 'package:internship_project/widgets/textfield_widget.dart';
+import 'package:provider/provider.dart';
 
-class AuthScreen extends StatelessWidget {
+import 'profile_screen.dart';
+
+class AuthScreen extends StatefulWidget {
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   var email_controller = TextEditingController();
+
   var password_controller = TextEditingController();
-  ModelClass? modelClass;
+
+  UserModel? userModel;
 
   @override
   Widget build(BuildContext context) {
@@ -22,21 +34,21 @@ class AuthScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(top: 40, left: 40),
+          padding: EdgeInsets.only(top: 40, left: 30),
           child: SizedBox(
-            height: 300,
-            width: 280,
+
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextFieldWidget(
                   textEditingController: email_controller,
-                  labelText: "Enter Email",
+                  labelText: "Your Email",
                 ),
+                SizedBox(height: 10),
                 TextFieldWidget(
                   textEditingController: password_controller,
-                  labelText: "Enter Password",
+                  labelText: "Your Password",
                 ),
+                SizedBox(height: 10),
                 ButtonWidget(
                   labelText: "Sign Up",
                   onPressed: () async {
@@ -53,7 +65,7 @@ class AuthScreen extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    ProfileData(modelClass: modelClass)),
+                                    ProfileData(userModel: userModel)),
                             (route) => false);
                       });
                     } catch (e) {
@@ -62,12 +74,13 @@ class AuthScreen extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                              "Error: Something went wrong : SignUp failed"),
+                              "$e"),
                         ),
                       );
                     }
                   },
                 ),
+                SizedBox(height: 10),
                 ButtonWidget(
                   labelText: "Sign In",
                   onPressed: () async {
@@ -79,13 +92,14 @@ class AuthScreen extends StatelessWidget {
                       )
                           .then((value) {
                         print("SignIn successfully");
-
+                        Provider.of<UserProvider>(context,listen: false).updateUser();      //call update function of userProvider to update changes
+                        Provider.of<PostProvider>(context,listen: false).updatePost();      //call update function of postProvider to update changes
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                modelClass == null ?  ProfileScreen()
-                                    : ProfileData(modelClass: modelClass)),
+                                userModel == null ?  ProfileScreen()
+                                    : ProfileData(userModel: userModel)),
                                 (route) => false);
                       });
                     } catch (e) {

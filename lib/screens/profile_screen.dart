@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:internship_project/Active_screens/profile.Data.dart';
-import 'package:internship_project/models/model_class.dart';
-import 'package:internship_project/screens/Auth_screen.dart';
-import 'package:internship_project/screens/dashboard_screen.dart';
+import 'package:internship_project/models/user_model.dart';
+import 'package:internship_project/screens/friends_screen.dart';
+import 'package:internship_project/screens/profile.data.dart';
+
+import 'auth_screen.dart';
+import 'dashboard_screen.dart';
 
 
 class ProfileScreen extends StatefulWidget {
@@ -15,7 +17,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final auth = FirebaseAuth.instance;
-  ModelClass? modelClass;
+  UserModel? authModel;
 
   @override
   void initState() {
@@ -34,7 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (snapshot.exists) {
       setState(() {
         print("userdata exist"); //It takes the data from the Firestore document (snapshot.data()) and converts it into a map before passing it to the fromMap method.
-        modelClass = ModelClass.fromMap(snapshot.data() as Map<String, dynamic>); //The snapshot.data() method retrieves the data from the Firestore document.
+        authModel = UserModel.fromMap(snapshot.data() as Map<String, dynamic>); //The snapshot.data() method retrieves the data from the Firestore document.
         // Now you have the Model object from Firestore data
       });
     } else {
@@ -75,24 +77,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             Container(
-                child: modelClass != null
+                child: authModel != null
                     ? Column(
                         children: <Widget>[
                           Center(
                             child: ClipOval(
                               child: Image(
-                                image: NetworkImage(modelClass!.image),
+                                image: NetworkImage(authModel!.image),
                                 height: 100,
                                 width: 100,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
-                          Text('Name: ${modelClass!.name}',
+                          Text('Name: ${authModel!.name}',
                               style: TextStyle(fontSize: 15)),
-                          Text('phone Number: ${modelClass!.phone}',
+                          Text('phone Number: ${authModel!.phone}',
                               style: TextStyle(fontSize: 15)),
-                          Text('Country: ${modelClass!.country}',
+                          Text('Country: ${authModel!.country}',
                               style: TextStyle(fontSize: 15)),
                           Column(
                             children: [
@@ -104,8 +106,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             builder:
                                                 (context) => // setting update button, on update it move to add screen with values saved in model class
                                                     ProfileData(
-                                                        modelClass:
-                                                            modelClass)));
+                                                        userModel:
+                                                            authModel)));
                                   },
                                   child: Text("Edit Profile")),
                               ElevatedButton(
@@ -118,6 +120,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             (route) => false);
                                   },
                                   child: Text("Dashboard")),
+                              ElevatedButton(onPressed: (){
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            FriendsScreen()));
+                              }, child: Text("Friends"))
                             ],
                           ),
                         ],
