@@ -5,7 +5,12 @@ import 'package:provider/provider.dart';
 import '../models/user_model.dart';
 import '../providers/user_provider.dart';
 
-class FriendsScreen extends StatelessWidget{
+class FriendsScreen extends StatefulWidget{
+  @override
+  State<FriendsScreen> createState() => _FriendsScreenState();
+}
+
+class _FriendsScreenState extends State<FriendsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,9 +47,13 @@ class FriendsScreen extends StatelessWidget{
                         onPressed: () async {
                           UserModel? currentUser =
                               userProvider.getUser(userProvider.currentUser!);
-                          userProvider.unFriend(
-                              requestUser!, currentUser!);
-                          print('friend removed');
+
+                          // Use setState to trigger a rebuild of the UI
+                          setState(() {
+                            userProvider.unFriend(
+                                requestUser!, currentUser!);
+                            print('friend removed');
+                          });
 
                           // Optionally, you can provide feedback to the user (e.g., a snackbar).
                           ScaffoldMessenger.of(context).showSnackBar(

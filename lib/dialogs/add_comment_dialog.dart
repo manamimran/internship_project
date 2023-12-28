@@ -1,17 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:internship_project/providers/user_provider.dart';
 import '../models/comment_model.dart';
+import '../models/user_model.dart';
 import '../providers/comment_provider.dart';
 
 class AddCommentDialog {
   static void showCommentDialog(
       BuildContext context,
       String postId,
-      String userId,
       CommentProvider commentProvider,
+      UserProvider userProvider
       ) {
     TextEditingController commentController = TextEditingController();
+    UserModel? userModel =  userProvider.getUser(userProvider.currentUser!);    // using getUser model of user provider to know user details
 
     showDialog(
       context: context,
@@ -38,7 +40,7 @@ class AddCommentDialog {
                   postId: postId,
                   comment: commentController.text,
                   timestamp: DateTime.now(),
-                  user: userId,
+                  user: userModel!.uid,
                 );
 
                 // Save the comment

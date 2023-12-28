@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CommentProvider>(//consumer for userprovider
+    return Consumer<CommentProvider>(//consumer for commentprovider
         builder: (BuildContext context, commentProvider, Widget? child) {
     return Consumer<UserProvider>(//consumer for userprovider
         builder: (BuildContext context, userProvider, Widget? child) {
@@ -29,69 +29,69 @@ class _HomeScreenState extends State<HomeScreen> {
       return Consumer<PostProvider>(//consumer for postprovider
           builder: (BuildContext context, postProvider, Widget? child) {
         // print(postProvider);
-        return Scaffold(
+            return Scaffold(
           appBar: AppBar(
             title: Text('Home Screen'),
             backgroundColor: Colors.amber,
           ),
           body: Padding(
             padding: EdgeInsets.all(10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Display the posts
-                SingleChildScrollView(
-                  child: SizedBox(
-                    height: 500,
-                    child: postProvider.isLoading //waiting for loading
-                        ? Center(
-                            child: CircularProgressIndicator(), // Loader widget
-                          )
-                        : ListView.builder(
-                            itemCount: postProvider.posts.length, //list of posts in postprovider
-                            itemBuilder: (context, index) {
-                              // Pass the current PostModel to the PostWidget
-                              PostModel currentPost = postProvider.posts[index];       //fetch list of posts
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Display the posts
+                  SizedBox(
+                      height: 500,
+                      child: postProvider.isLoading //waiting for loading
+                          ? Center(
+                              child: CircularProgressIndicator(), // Loader widget
+                            )
+                          : ListView.builder(
+                              itemCount: postProvider.posts.length, //list of posts in postprovider
+                              itemBuilder: (context, index) {
+                                // Pass the current PostModel to the PostWidget
+                                PostModel currentPost = postProvider.posts[index];       //fetch list of posts
 
-                              UserModel? userdata = userProvider
-                                      .allUserData.isNotEmpty
-                                  ? userProvider.allUserData.firstWhere(
-                                      (authModel) => //pick the profile of user who posted the post ,
-                                      authModel.uid ==
-                                          currentPost
-                                              .userId) // filter from list of all users list from user provider
-                                  : null;
-                              return Container(
-                                padding: EdgeInsets.all(20),
-                                child: postWidget(
-                                    //showing post widget
-                                    currentPost,
-                                    userdata,
-                                    postProvider,commentProvider,userProvider),
-                              );
-                            },
-                          ),
+                                UserModel? userdata = userProvider
+                                        .allUserData.isNotEmpty
+                                    ? userProvider.allUserData.firstWhere(
+                                        (authModel) => //pick the profile of user who posted the post ,
+                                        authModel.uid ==
+                                            currentPost
+                                                .userId) // filter from list of all users list from user provider
+                                    : null;
+                                return Container(
+                                  padding: EdgeInsets.all(20),
+                                  child: postWidget(
+                                      //showing post widget
+                                      currentPost,
+                                      userdata,
+                                      postProvider,commentProvider,userProvider),
+                                );
+                              },
+                            ),
                   ),
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: //going to add post screen
-                                  (context) => AddPostScreen()));
-                    },
-                    child: Icon(Icons.add),
-                    backgroundColor: Colors.amber,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          50.0), // You can adjust the radius
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: //going to add post screen
+                                    (context) => AddPostScreen()));
+                      },
+                      child: Icon(Icons.add),
+                      backgroundColor: Colors.amber,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            50.0), // You can adjust the radius
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -108,7 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
       UserProvider userProvider){
 
     bool isLiked; //isLiked variable
-    isLiked = postModel.likedPosts.contains(currentUser!.uid); // checking whether the currentUser.uid is present in the likedPosts list of a postModel'
+
+    isLiked = postModel.likedPosts.contains(userModel!.uid); // checking whether the currentUser.uid is present in the likedPosts list of a postModel'
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -154,11 +155,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (isLiked) {
                             // Unlike the post
                             postProvider.unlikePost(
-                                userModel!.uid, postModel.postId);
+                                userModel.uid, postModel.postId);
                           } else {
                             // Like the post
                             postProvider.likePost(
-                                userModel!.uid,
+                                userModel.uid,
                                 postModel.postId); //saving likes wrt to user id in firestore
                           }
                           isLiked = !isLiked;
@@ -200,8 +201,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       AddCommentDialog.showCommentDialog(
                         context,
                         postModel.postId,
-                        userModel!.uid,
                         commentProvider,
+                        userProvider
                       );
                     },
                     child: Padding(
@@ -218,8 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return AlertDialog(
                           backgroundColor: Colors.amber,
                           title: Text("Delete Post"),
-                          content: Text(
-                              "Are you sure you want to delete this post?"),
+                          content: Text("Are you sure you want to delete this post?"),
                           actions: [
                             TextButton(
                               onPressed: () {
@@ -229,14 +229,27 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             TextButton(
                               onPressed: () async {
-                                // Perform the post deletion logic
-                                await postProvider.deletePost(postModel.postId);
+                                // Check if the current user is the one who posted the post
+                                if (postModel.userId == currentUser!.uid) {
+                                  // Perform the post deletion logic
+                                  await postProvider.deletePost(postModel.postId);
 
-                                // Close the dialog
-                                Navigator.pop(context);
+                                  // Close the dialog
+                                  Navigator.pop(context);
+                                } else {
+                                  // Display an error message or handle as needed
+                                  // For example, show a snackbar
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("You don't have permission to delete this post."),
+                                    ),
+                                  );
+
+                                  // Close the dialog
+                                  Navigator.pop(context);
+                                }
                               },
-                              child: Text('Delete',
-                                  style: TextStyle(color: Colors.red)),
+                              child: Text('Delete', style: TextStyle(color: Colors.red)),
                             ),
                           ],
                         );

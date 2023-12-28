@@ -38,15 +38,15 @@ class _RequestScreenState extends State<RequestScreen> {
 
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(requestUser?.image ?? ''),
+                    backgroundImage: NetworkImage(requestUser!.image),
                   ),
-                  title: Text(requestUser?.name ?? 'User Name'),
+                  title: Text(requestUser.name),
                   subtitle: ElevatedButton(
                     onPressed: () async {
-
                       UserModel? currentUser = userProvider.getUser(userProvider.currentUser!);   // using getUser model of user provider to know user details
-                      userProvider.acceptFriendRequest(requestUser!, currentUser!);
+                      userProvider.acceptFriendRequest(requestUser, currentUser!);
                       print('friend added');
+
 
                       // Optionally, you can provide feedback to the user (e.g., a snackbar).
                       ScaffoldMessenger.of(context).showSnackBar(

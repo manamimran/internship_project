@@ -18,6 +18,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
+        // print(userProvider.friends.length);
+        // print("friends");
         return Scaffold(
           appBar: AppBar(
             actions: [  IconButton(
@@ -52,7 +54,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
               // Check if the user's ID is already in the sendRequests list
               bool isRequestPending = userModel.getRequests.contains(userProvider.currentUser!);    // check if current logged-in id present in getRequest list
-              print(userProvider.currentUser);
+              // print(userProvider.currentUser);
               // print("current user id");
               return ListTile(
               leading: CircleAvatar(
@@ -61,14 +63,16 @@ class _SearchScreenState extends State<SearchScreen> {
               title: Text(userModel.name),
               trailing: Column(
                 children: [
+
                   // Check if the user is already a friend
-                  if (userProvider.isFriend(userModel.uid))
-                    Text('Friends') // Display "Friends" if the user is already a friend
+                  if (userProvider.getUser(userProvider.currentUser!)!.friends.contains(userModel.uid))
+                    Text('Friends',style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold )) // Display "Friends" if the user is already a friend
 
                   else
                     ElevatedButton(
                       onPressed: () async {
                         if (!isRequestPending) {
+
                           // Send friend request when the button is pressed
                           UserModel? currentUser = userProvider.getUser(userProvider.currentUser!);
                           await userProvider.sendFriendRequest(

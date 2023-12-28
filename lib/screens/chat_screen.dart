@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:internship_project/models/user_model.dart';
+import 'package:internship_project/screens/friends_screen.dart';
 import 'package:internship_project/screens/search_screen.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -30,7 +31,7 @@ class ChatScreen extends StatelessWidget {
                       MaterialPageRoute(
                           builder:
                               (context) =>
-                         SearchScreen()));
+                         FriendsScreen()));
                 },
                 child: Icon(Icons.add),
                 backgroundColor: Colors.amber,

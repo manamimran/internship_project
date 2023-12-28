@@ -22,9 +22,9 @@ class PostProvider extends ChangeNotifier {
   final CollectionReference<Map<String, dynamic>> postCollection = FirebaseFirestore.instance.collection('posts');
 
   Future<void> addPost(String imageUrl) async {
-    var uid = FirebaseAuth.instance.currentUser?.uid;   //current loginin user id
+    var currentUser = FirebaseAuth.instance.currentUser?.uid;   //current loginin user id
 
-    if (uid != null) {
+    if (currentUser != null) {
       isLoading = true; // Set loading state to true before fetching
 
       var doc = postCollection.doc();
@@ -33,7 +33,7 @@ class PostProvider extends ChangeNotifier {
         postTimestamp: DateTime.now(),
         postId:doc.id,
         likedPosts: [],
-        userId: uid,
+        userId: currentUser,
       );
       await doc.set(postModel.toMap());
       notifyListeners();
@@ -43,13 +43,23 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
+  // // New function to get a user by ID
+  // PostModel? getUser(String id){
+  //   PostModel? postModel;
+  //
+  //   postModel = posts.where((element) => element.userId == id).firstOrNull;
+  //   return postModel;
+  // }
+
   Future<void> fetchPosts() async {
     try {
       var uid = FirebaseAuth.instance.currentUser?.uid;
 
       if (uid != null) {
+
         postCollection
-            .where('UserId', isEqualTo: uid)              //fetch profile info of user who make the post only logged_in user
+            // .where('UserId', whereIn: friendIds)
+            .where('UserId', isEqualTo: uid)              //fetch post of current user logged_in
             // .orderBy('Timetamp', descending: true)
             .snapshots()                                       //Specifically, it contains a list of QueryDocumentSnapshot instances, where each QueryDocumentSnapshot represents a document in the query result.
             .listen((QuerySnapshot querySnapshot) {            //It uses a stream to listen for updates to the posts collection.
@@ -89,9 +99,10 @@ class PostProvider extends ChangeNotifier {
   }
 
   bool likePost(String UserId,String PostId) {
+
     print("like");
     postCollection.doc(PostId).update({
-      'LikedPosts': [UserId]
+      'LikedPosts': FieldValue.arrayUnion([UserId]),
     });
     return true;
   }
