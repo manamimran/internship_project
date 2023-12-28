@@ -7,7 +7,7 @@ import '../models/user_model.dart';
 class UserProvider extends ChangeNotifier {
 
   UserProvider() {
-    // usersController = StreamController<List<UserModel>>.broadcast();
+    usersController = StreamController<List<UserModel>>.broadcast();
     updateUser();
     // print('List of all Users');
   }
