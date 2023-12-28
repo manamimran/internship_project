@@ -59,7 +59,7 @@ class PostProvider extends ChangeNotifier {
 
         postCollection
             // .where('UserId', whereIn: friendIds)
-            .where('UserId', isEqualTo: uid)              //fetch post of current user logged_in
+            // .where('UserId', isEqualTo: uid)              //fetch post of current user logged_in
             // .orderBy('Timetamp', descending: true)
             .snapshots()                                       //Specifically, it contains a list of QueryDocumentSnapshot instances, where each QueryDocumentSnapshot represents a document in the query result.
             .listen((QuerySnapshot querySnapshot) {            //It uses a stream to listen for updates to the posts collection.
