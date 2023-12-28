@@ -40,11 +40,13 @@ class _AuthScreenState extends State<AuthScreen> {
             child: Column(
               children: [
                 TextFieldWidget(
+                  isPassword: false,
                   textEditingController: email_controller,
                   labelText: "Your Email",
                 ),
                 SizedBox(height: 10),
                 TextFieldWidget(
+                  isPassword: true,
                   textEditingController: password_controller,
                   labelText: "Your Password",
                 ),

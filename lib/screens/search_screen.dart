@@ -18,8 +18,6 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
-        // print(userProvider.friends.length);
-        // print("friends");
         return Scaffold(
           appBar: AppBar(
             actions: [  IconButton(

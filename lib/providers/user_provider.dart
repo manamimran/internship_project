@@ -41,8 +41,8 @@ class UserProvider extends ChangeNotifier {
               .map((doc) =>
               UserModel.fromMap(doc.data() as Map<String, dynamic>))
               .toList();
-          print(allUserData.length);
-          print("all users");
+          // print(allUserData.length);
+          // print("all users");
           notifyListeners();
           usersController.add(allUserData);
         } else {
@@ -52,6 +52,7 @@ class UserProvider extends ChangeNotifier {
     } catch (error) {
       print("Error fetching user data: $error");
     }
+    notifyListeners();
   }
 
   Future<void> updateUser() async {
@@ -72,7 +73,7 @@ class UserProvider extends ChangeNotifier {
         'GetRequest': FieldValue.arrayUnion([current.uid]),
       });
 
-      // Listen to changes on the sender's document (optional)
+      // Listen to changes on the sender's document
       firestoreInstance.collection("usersData").doc(other.uid).snapshots().listen((DocumentSnapshot<Map<String, dynamic>> snapshot) {
       });
     } catch (e) {
@@ -80,17 +81,17 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<String>> getFriendRequests(String uid) async {
-    try {
-      final DocumentSnapshot<Map<String, dynamic>> snapshot =
-      await firestoreInstance.collection("usersData").doc(uid).get();
-
-      return (snapshot.data()?['GetRequest'] as List<dynamic>? ?? []).cast<String>();
-    } catch (e) {
-      print("Error fetching friend requests: $e");
-      return [];
-    }
-  }
+  // Future<List<String>> getFriendRequests(String uid) async {
+  //   try {
+  //     final DocumentSnapshot<Map<String, dynamic>> snapshot =
+  //     await firestoreInstance.collection("usersData").doc(uid).get();
+  //
+  //     return (snapshot.data()?['GetRequest'] as List<dynamic>? ?? []).cast<String>();
+  //   } catch (e) {
+  //     print("Error fetching friend requests: $e");
+  //     return [];
+  //   }
+  // }
 
   Future<void> acceptFriendRequest(UserModel other, UserModel current) async {
   try {

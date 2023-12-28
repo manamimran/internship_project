@@ -55,9 +55,9 @@ class _RequestScreenState extends State<RequestScreen> {
                         ),
                       );
                       // Remove the item from the list after accepting the request
-                      setState(() {
-                        pendingRequests.removeAt(index);
-                      });
+                      // setState(() {
+                      //   pendingRequests.removeAt(index);
+                      // });
                     },
                     child: Text('Accept'),
 
