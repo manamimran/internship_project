@@ -16,11 +16,21 @@ class UserProvider extends ChangeNotifier {
   var currentUser = FirebaseAuth.instance.currentUser?.uid;   //current loginin user id
 
   List<UserModel> allUserData = [];
+  // List<UserModel> filteredUsers = [];     //This list is used to store the users that match the search criteria.
   // List of friends for the current user
   // List<String> friends = [];
   late StreamController<List<UserModel>> usersController;
 
   Stream<List<UserModel>> get usersStream => usersController.stream;
+
+  // void filterUsers(List<UserModel> allUserData, String query, String currentUserUid) {
+  //     filteredUsers = allUserData
+  //         .where((userModel) =>
+  //     userModel.name.toLowerCase().contains(query.toLowerCase()) &&
+  //         userModel.uid != currentUserUid)  // it ensures that the user is not included if their ID matches the current user's ID.
+  //         .toList();
+  //     notifyListeners();
+  // }
 
   // New function to get a user by ID
   UserModel? getUser(String id){

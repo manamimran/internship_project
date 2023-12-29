@@ -98,6 +98,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         onPrimary: Colors.white, // Text color
                         elevation: 4, // Elevation
                       ),
+
                       child: Text(isRequestPending ? 'Pending' : 'Add Friend'),
                     ),
                   // Divider(),
