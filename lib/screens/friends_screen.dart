@@ -37,10 +37,10 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 return ListTile(
                   leading: CircleAvatar(
                     backgroundImage: NetworkImage(
-                        requestUser?.image ?? ''), // Display the user's image
+                        requestUser!.image), // Display the user's image
                   ),
-                  title: Text(requestUser?.name ?? 'User Name'),
-                  subtitle: Text(requestUser?.phone ?? 'Country'),
+                  title: Text(requestUser.name),
+                  subtitle: Text(requestUser.phone),
                   trailing: Column(
                     children: [
                       IconButton(
@@ -51,7 +51,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                           // Use setState to trigger a rebuild of the UI
                           setState(() {
                             userProvider.unFriend(
-                                requestUser!, currentUser!);
+                                requestUser, currentUser!);
                             print('friend removed');
                           });
 

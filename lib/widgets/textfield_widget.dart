@@ -19,7 +19,7 @@ class TextFieldWidget extends StatelessWidget{
               decoration: InputDecoration(
                   hintText: labelText
               ),
-            )
+            ),
 
     );
   }

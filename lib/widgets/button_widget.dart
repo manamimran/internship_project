@@ -16,7 +16,7 @@ class ButtonWidget extends StatelessWidget{
            child: Center(
                child: Text(labelText,style: TextStyle(
                  color: Colors.white, // Set the text color here
-               ),))),
+               ),),),),
 
    );
   }

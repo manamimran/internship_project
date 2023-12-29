@@ -58,9 +58,12 @@ class _RequestScreenState extends State<RequestScreen> {
                       // setState(() {
                       //   pendingRequests.removeAt(index);
                       // });
-                    },
+                    },  style: ElevatedButton.styleFrom(
+                    primary: Colors.amber, // Background color
+                    onPrimary: Colors.white, // Text color
+                    elevation: 4, // Elevation
+                  ),
                     child: Text('Accept'),
-
                   ),
                 );
               },

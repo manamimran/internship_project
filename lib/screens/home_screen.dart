@@ -109,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     bool isLiked; //isLiked variable
 
-    isLiked = postModel.likedPosts.contains(userModel!.uid); // checking whether the currentUser.uid is present in the likedPosts list of a postModel'
+    isLiked = postModel.likedPosts.contains(userProvider.currentUser!); // checking whether the currentUser.uid is present in the likedPosts list of a postModel'
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -155,11 +155,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (isLiked) {
                             // Unlike the post
                             postProvider.unlikePost(
-                                userModel.uid, postModel.postId);
+                                userProvider.currentUser!, postModel.postId);
                           } else {
                             // Like the post
                             postProvider.likePost(
-                                userModel.uid,
+                                userProvider.currentUser!,
                                 postModel.postId); //saving likes wrt to user id in firestore
                           }
                           isLiked = !isLiked;

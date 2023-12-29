@@ -81,7 +81,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
             backgroundColor: Colors.amber,
             title: Text('Add Post'),
           ),
-
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -95,11 +94,21 @@ class _AddPostScreenState extends State<AddPostScreen> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: (isUploading ? null : pickImageFromGallery),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.amber, // Background color
+                  onPrimary: Colors.white, // Text color
+                  elevation: 4, // Elevation
+                ),
                 child: Text('Pick Image from Gallery'),
               ),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: (isUploading ? null : pickImageFromCamera),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.amber, // Background color
+                  onPrimary: Colors.white, // Text color
+                  elevation: 4, // Elevation
+                ),
                 child: Text('Pick Image from Camera'),
               ),
               ElevatedButton(
@@ -118,6 +127,11 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     // Show an error message or handle the case when no image is selected
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.amber, // Background color
+                  onPrimary: Colors.white, // Text color
+                  elevation: 4, // Elevation
+                ),
                 child: Text('Upload'),
               ),
             ],

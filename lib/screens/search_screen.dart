@@ -93,6 +93,11 @@ class _SearchScreenState extends State<SearchScreen> {
                           );
                         }
                       },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.amber, // Background color
+                        onPrimary: Colors.white, // Text color
+                        elevation: 4, // Elevation
+                      ),
                       child: Text(isRequestPending ? 'Pending' : 'Add Friend'),
                     ),
                   // Divider(),

@@ -67,7 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 );
               },
-              icon: Icon(Icons.logout))
+              icon: Icon(Icons.logout)),
         ],
         title: Text('Profile Screen'),
         backgroundColor: Colors.amber,
@@ -109,6 +109,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         userModel:
                                                             authModel)));
                                   },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.amber, // Background color
+                                    onPrimary: Colors.white, // Text color
+                                    elevation: 4, // Elevation
+                                  ),
                                   child: Text("Edit Profile")),
                               ElevatedButton(
                                   onPressed: () {
@@ -119,6 +124,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 DashBoardScreen()),
                                             (route) => false);
                                   },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.amber, // Background color
+                                    onPrimary: Colors.white, // Text color
+                                    elevation: 4, // Elevation
+                                  ),
                                   child: Text("Dashboard")),
                               ElevatedButton(onPressed: (){
                                 Navigator.push(
@@ -126,14 +136,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             FriendsScreen()));
-                              }, child: Text("Friends"))
+                              },  style: ElevatedButton.styleFrom(
+                                primary: Colors.amber, // Background color
+                                onPrimary: Colors.white, // Text color
+                                elevation: 4, // Elevation
+                              ),
+                                  child: Text("Friends")),
                             ],
                           ),
                         ],
                       )
                     : Center(
                         child:
-                            CircularProgressIndicator()) // Show loading indicator while data is being fetched
+                            CircularProgressIndicator()), // Show loading indicator while data is being fetched
                 ),
           ],
         ),
